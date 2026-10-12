@@ -1,0 +1,44 @@
+Signature-Version: 1.0
+Created-By: 1.0 (Android)
+SHA-256-Digest-Manifest: LEHA7uyHM3qb72llltWb5LjIN4OyeyrQ/bsPC9JTC+M=
+X-Android-APK-Signed: 2, 3
+
+Name: AndroidManifest.xml
+SHA-256-Digest: 4JXtvNW2hJMA7x/V2iGnNEAVHtyWtkSH5mZkTxN/t9U=
+
+Name: assets/backup.jpg
+SHA-256-Digest: Yl0AgcLMV5c13xjeLNOFM/CqWuWrIFu8qiT+7o6YlcI=
+
+Name: assets/backupunlocked.mp4
+SHA-256-Digest: Wpj2i/tFwKn4ID28vAF89Ip9Iczmx8RkSf88Mv8Y9AY=
+
+Name: assets/unlocked.mp4
+SHA-256-Digest: vWdb/vO2sQXrEiFWHkFj/biP8Q6bmoLu5U99C7+E1LI=
+
+Name: classes.dex
+SHA-256-Digest: 0YNy/IWkSL2oCJB4R8vGdNkR5c+kHwBFeReVfEIABRQ=
+
+Name: res/drawable-xxhdpi-v4/banner.jpg
+SHA-256-Digest: BUY1fc9aIyLUgwWfiqDtPHJV0yVfi+GzihTWImsYCNo=
+
+Name: res/drawable-xxhdpi-v4/icon.png
+SHA-256-Digest: A4//KVYamJO9Nb96gg7x0ppddj5zH8W0gAIgaDvVrqY=
+
+Name: res/drawable-xxhdpi-v4/preview.jpg
+SHA-256-Digest: mJNaVbRuuCVKVeS5xLKEzlzwSh1MST/ZDVGwivX8F1I=
+
+Name: res/raw/video_fs.glsl
+SHA-256-Digest: nHNF60t1r/1L1jsUb9kRRxbxc5+KrKQUbo3Ra2OMWlc=
+
+Name: res/raw/video_vs.glsl
+SHA-256-Digest: HWkH7wtvH6GPMptvWoofJw3cLBYQ6Bc7YjojlCdYb/4=
+
+Name: res/xml/skin_info.xml
+SHA-256-Digest: 3TU6ndTP2I/eK8GF/B9aIwRRQ7/D0W6zL4d3rSodXOg=
+
+Name: res/xml/wallpaper.xml
+SHA-256-Digest: QC+3gJGjBapPwN36gDQN+MP+m1XsI+Wtj7faIdYizq8=
+
+Name: resources.arsc
+SHA-256-Digest: bRcsmIuL1vFP5s+l5PCGxzlbGvd/r64OkmEULzMWJ9c=
+

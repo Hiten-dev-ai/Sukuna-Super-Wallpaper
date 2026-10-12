@@ -1,0 +1,41 @@
+Manifest-Version: 1.0
+
+Name: AndroidManifest.xml
+SHA-256-Digest: gh5g5UEk1QfstRcxo7CAS7X96zbRNeExtAnVSToMiEE=
+
+Name: assets/backup.jpg
+SHA-256-Digest: lSBCdk1pGVtCypaG5UlMIlPRONwHI0N2GhzLwIFxeOo=
+
+Name: assets/backupunlocked.mp4
+SHA-256-Digest: goNzunqlUKvQsnsC3qoTfcIYYS3Vda6kNZkGWzyaKgY=
+
+Name: assets/unlocked.mp4
+SHA-256-Digest: i+m/rMjr4+T1v6FEzlwr4x+9/H7hNCo66NkAOhAUkW8=
+
+Name: classes.dex
+SHA-256-Digest: QzJgJCLFXP9sS7uyVOtuEFYc6ygzFzkB5Iwx5jZ/yPs=
+
+Name: res/drawable-xxhdpi-v4/banner.jpg
+SHA-256-Digest: svM1TnfOpAJ5SflBtFwSWZjqvytw26zHAJh3/twms8E=
+
+Name: res/drawable-xxhdpi-v4/icon.png
+SHA-256-Digest: 7mqZvPMPm7rieFgDtDoWetUz+71aODZ/fA+CoQqwOJw=
+
+Name: res/drawable-xxhdpi-v4/preview.jpg
+SHA-256-Digest: svM1TnfOpAJ5SflBtFwSWZjqvytw26zHAJh3/twms8E=
+
+Name: res/raw/video_fs.glsl
+SHA-256-Digest: 8A9mXIVXDrjSsqwpyZDN+YB9AdP3nRMzJQadItb2+wA=
+
+Name: res/raw/video_vs.glsl
+SHA-256-Digest: 8tXAZUVV1D2btcJRyZCkhiEEXCEqOcVaTcR3Z5DMpwU=
+
+Name: res/xml/skin_info.xml
+SHA-256-Digest: IFbYz9ChgDjZYpwJR8GdfZVs7wF+dIU9HpyQNVEwasc=
+
+Name: res/xml/wallpaper.xml
+SHA-256-Digest: nawWb2WuuL4Pxs+3Drzk2+B9BrrFWAGO0B8tPXcPr8w=
+
+Name: resources.arsc
+SHA-256-Digest: ZF1rSCqbyL72/z68P7GwP4efyWaa2BodL1lyjunGR+Y=
+

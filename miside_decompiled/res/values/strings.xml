@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallpaper_name">Sukuna Super Wallpaper</string>
+    <string name="unlock_video">unlocked.mp4</string>
+    <string name="wallpaper_component">com.androradar.walls6/com.androradar.walls6.LiveWallpaperService</string>
+</resources>

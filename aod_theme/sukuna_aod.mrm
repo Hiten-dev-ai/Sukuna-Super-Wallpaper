@@ -1,0 +1,52 @@
+{
+  "localId": "sukuna_aod",
+  "onlineId": null,
+  "assemblyId": "c7a2309d-91db-42f2-bf36-7db663d62715",
+  "productId": "c7a2309d-91db-42f2-bf36-7db663d62715",
+  "hash": "dfd10aac6efe628e74b4559769f1e4680d24d804",
+  "platform": 17,
+  "size": 1643623,
+  "updatedTime": 1406786563035,
+  "version": "1.0",
+  "authors": {
+    "fallback": "Antigravity",
+    "en_US": "Antigravity",
+    "zh_CN": "Antigravity"
+  },
+  "designers": {
+    "fallback": "Antigravity",
+    "en_US": "Antigravity",
+    "zh_CN": "Antigravity"
+  },
+  "titles": {
+    "fallback": "Sukuna AOD",
+    "en_US": "Sukuna AOD",
+    "zh_CN": "Sukuna AOD"
+  },
+  "descriptions": {
+    "fallback": "Ryomen Sukuna Domain Expansion",
+    "en_US": "Ryomen Sukuna Domain Expansion",
+    "zh_CN": "Ryomen Sukuna Domain Expansion"
+  },
+  "builtInThumbnails": {},
+  "thumbnails": [],
+  "previews": [],
+  "parentResources": [
+    {
+      "localId": "257094b3-003a-48bb-ab57-5203235302af",
+      "resourceCode": "theme",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    }
+  ],
+  "subResources": [],
+  "extraMeta": {},
+  "metaPath": null,
+  "contentPath": null,
+  "rightsPath": null,
+  "screenRatio": null,
+  "fontWeight": null,
+  "miuiAdapterVersion": 3.2,
+  "wallpaperStyle": 0
+}

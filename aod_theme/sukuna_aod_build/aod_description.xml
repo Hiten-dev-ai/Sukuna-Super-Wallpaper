@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MIUI_Theme_Values>
+    <theme_type>maml_style</theme_type>
+    <theme_name>Sukuna AOD</theme_name>
+    <theme_description>Ryomen Sukuna Domain Expansion</theme_description>
+    <maml_thumbnail>maml_thumb.png</maml_thumbnail>
+    <support_battery>1</support_battery>
+    <battery_enable>1</battery_enable>
+    <support_notification>1</support_notification>
+    <notification_enable>1</notification_enable>
+</MIUI_Theme_Values>

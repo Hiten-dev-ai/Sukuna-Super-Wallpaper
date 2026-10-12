@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<aod frameRate="0" screenWidth="1220" screenHeight="2712" version="1">
+    <Image x="0" y="0" src="sukuna_aod.png" w="1220" h="2712"/>
+    <DateTime x="610" y="520" align="center" size="140" color="#FFFFFFFF" format="HH:mm"/>
+    <DateTime x="610" y="660" align="center" size="40" color="#B3FFFFFF" format="EEE, MMM d"/>
+</aod>

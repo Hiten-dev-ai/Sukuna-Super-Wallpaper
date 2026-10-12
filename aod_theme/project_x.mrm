@@ -1,0 +1,184 @@
+{
+  "localId": "23403247-3f1f-4853-8688-9d23035d72d1",
+  "onlineId": "86345b49-b1d4-4840-8690-0cbaa2d7dffd",
+  "assemblyId": "ac57ad80-b257-486e-ac54-91f4164a44dd",
+  "productId": "ac57ad80-b257-486e-ac54-91f4164a44dd",
+  "hash": "bbb3ce6a46e07ad581dbe7fa0fcea59a1a8b93b6",
+  "platform": 15,
+  "size": 35920972,
+  "updatedTime": 1406786563035,
+  "version": "1.0.0",
+  "authors": {
+    "en_US": "mhmmdynx",
+    "zh_CN": "mhmmdynx",
+    "fallback": "mhmmdynx"
+  },
+  "designers": {
+    "en_US": "Yunuz Alvarez",
+    "zh_CN": "Yunuz Alvarez",
+    "fallback": "Yunuz Alvarez"
+  },
+  "titles": {
+    "en_US": "ProjectX",
+    "zh_CN": "ProjectX",
+    "fallback": "ProjectX"
+  },
+  "descriptions": {
+    "en_US": "HyperOS1\n⚠️ The system and themes can bug out sometimes, so back up your stuff first unless you wanna deal with a mess later‼️\n⚠️ If things get glitchy after you apply the theme, just restart your phone and it should load up clean‼️",
+    "zh_CN": "HyperOS1 Theme. Apply and reboot your phone.",
+    "fallback": "HyperOS1 Theme. Apply and reboot your phone."
+  },
+  "builtInThumbnails": {
+    "en_US": [
+      "en_US_lockscreen_0.jpg",
+      "en_US_launcher_0.jpg",
+      "en_US_launcher_1.jpg",
+      "en_US_statusbar_0.jpg",
+      "en_US_mms_0.jpg",
+      "en_US_icons_0.jpg",
+      "en_US_icons_1.jpg",
+      "en_US_icons_2x3_0.jpg",
+      "en_US_icons_4x3_0.jpg"
+    ]
+  },
+  "builtInPreviews": {
+    "en_US": [
+      "en_US_lockscreen_0.jpg",
+      "en_US_launcher_0.jpg",
+      "en_US_launcher_1.jpg",
+      "en_US_statusbar_0.jpg",
+      "en_US_mms_0.jpg",
+      "en_US_icons_0.jpg",
+      "en_US_icons_1.jpg",
+      "en_US_icons_2x3_0.jpg",
+      "en_US_icons_4x3_0.jpg"
+    ]
+  },
+  "thumbnails": [
+    {
+      "localPath": "0c8405bba29324614a2d35ba94246f15e44e74ba4",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w362q90/ThemeMarket/0c8405bba29324614a2d35ba94246f15e44e74ba4"
+    }
+  ],
+  "previews": [
+    {
+      "localPath": "0c8405bba29324614a2d35ba94246f15e44e74ba4",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0c8405bba29324614a2d35ba94246f15e44e74ba4"
+    },
+    {
+      "localPath": "09e8595536d0e40dbadff1f65703693e04e3de477",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/09e8595536d0e40dbadff1f65703693e04e3de477"
+    },
+    {
+      "localPath": "068e85bd8a72647b797b26793869a28ba98f76d8e",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/068e85bd8a72647b797b26793869a28ba98f76d8e"
+    },
+    {
+      "localPath": "03b18544b34e34b46895fe581aa9c1a845a6809ed",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/03b18544b34e34b46895fe581aa9c1a845a6809ed"
+    },
+    {
+      "localPath": "0efe2579c69434f139d33eb5d4189c8e73f2c2823",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0efe2579c69434f139d33eb5d4189c8e73f2c2823"
+    },
+    {
+      "localPath": "0efe2579c69434f139d33eb5d4189c8e73f2c2823",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0efe2579c69434f139d33eb5d4189c8e73f2c2823"
+    }
+  ],
+  "parentResources": [],
+  "subResources": [
+    {
+      "localId": "f57580b0-c22d-4fd8-a4ef-7bb9805e9e32",
+      "resourceCode": "contact",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "2dc2b426-b26d-45b4-938c-8f8b7f66cff8",
+      "resourceCode": "wallpaper",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "bf62d4d3-7fbc-4ba1-9b09-9d229f57a829",
+      "resourceCode": "lockstyle",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "3ddecad0-6e79-45d5-8d26-8abfd05ec493",
+      "resourceCode": "bootanimation",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "be18dfa6-1ce2-4b61-8096-16ff5f568e1d",
+      "resourceCode": "mms",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "581d39c4-5a99-48cc-88d4-855b2c184f66",
+      "resourceCode": "launcher",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "e3e28ade-d09d-4d3b-8979-5a8f869c88b1",
+      "resourceCode": "statusbar",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "40b0eb0c-258f-4829-a3e8-e5dc432926a8",
+      "resourceCode": "lockscreen",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "9db7c395-4f9b-428e-8844-49c2babcbc8b",
+      "resourceCode": "com.android.settings",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "34c86d73-7edd-4ebe-b119-df0d1228be22",
+      "resourceCode": "icons",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "d4179801-225e-419e-980b-c544880746c7",
+      "resourceCode": "clock_2x4",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "47fd8c4e-037e-453f-afdf-e3859c2f6e0d",
+      "resourceCode": "miui.systemui.plugin",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    }
+  ],
+  "extraMeta": {},
+  "metaPath": null,
+  "contentPath": null,
+  "rightsPath": null,
+  "screenRatio": null,
+  "fontWeight": null,
+  "miuiAdapterVersion": 3.0999999046325684,
+  "wallpaperStyle": 0
+}

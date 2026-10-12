@@ -1,0 +1,195 @@
+{
+  "localId": "257094b3-003a-48bb-ab57-5203235302af",
+  "onlineId": "53805db9-af33-4bcc-959d-aa207aa70a56",
+  "assemblyId": "c7a2309d-91db-42f2-bf36-7db663d62715",
+  "productId": "c7a2309d-91db-42f2-bf36-7db663d62715",
+  "hash": "356a076a80b69efff5b9f39d35e3c8e4cf9806a5",
+  "platform": 17,
+  "size": 18645613,
+  "updatedTime": 1406786563035,
+  "version": "1.0",
+  "authors": {
+    "en_US": "Eto'mox",
+    "zh_CN": "Eto'mox",
+    "fallback": "Eto'mox"
+  },
+  "designers": {
+    "en_US": "Eto'mox",
+    "zh_CN": "Eto'mox",
+    "fallback": "Eto'mox"
+  },
+  "titles": {
+    "en_US": "Liquid 26",
+    "zh_CN": "Liquid 26",
+    "fallback": "Liquid 26"
+  },
+  "descriptions": {
+    "en_US": "Liquid",
+    "zh_CN": "Liquid",
+    "fallback": "Liquid"
+  },
+  "builtInThumbnails": {
+    "en_US": [
+      "en_US_lockscreen_0.jpg",
+      "en_US_launcher_0.jpg",
+      "en_US_launcher_1.jpg",
+      "en_US_statusbar_0.jpg",
+      "en_US_icons_0.jpg",
+      "en_US_icons_1.jpg",
+      "en_US_icons_2x3_0.jpg",
+      "en_US_icons_4x3_0.jpg",
+      "en_US_clock_2x4_0.png"
+    ]
+  },
+  "builtInPreviews": {
+    "en_US": [
+      "en_US_lockscreen_0.jpg",
+      "en_US_launcher_0.jpg",
+      "en_US_launcher_1.jpg",
+      "en_US_statusbar_0.jpg",
+      "en_US_icons_0.jpg",
+      "en_US_icons_1.jpg",
+      "en_US_icons_2x3_0.jpg",
+      "en_US_icons_4x3_0.jpg",
+      "en_US_clock_2x4_0.png"
+    ]
+  },
+  "thumbnails": [
+    {
+      "localPath": "00ee202ab26f44121a478bc1e62ff6bfcb27c2077",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w362q90/ThemeMarket/00ee202ab26f44121a478bc1e62ff6bfcb27c2077"
+    }
+  ],
+  "previews": [
+    {
+      "localPath": "00ee202ab26f44121a478bc1e62ff6bfcb27c2077",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/00ee202ab26f44121a478bc1e62ff6bfcb27c2077"
+    },
+    {
+      "localPath": "0ce34e2b6ae4c4a15a8ca811d8e71249ecbc0163a",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0ce34e2b6ae4c4a15a8ca811d8e71249ecbc0163a"
+    },
+    {
+      "localPath": "07b82f38e4ccf4222b3519731b0af41d4119bee90",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/07b82f38e4ccf4222b3519731b0af41d4119bee90"
+    },
+    {
+      "localPath": "05176e85163ad4871b831f12ed5f8f57f67edc8eb",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/05176e85163ad4871b831f12ed5f8f57f67edc8eb"
+    },
+    {
+      "localPath": "0f29f199b91ed4b189846a3b681e7ac861d755a46",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0f29f199b91ed4b189846a3b681e7ac861d755a46"
+    },
+    {
+      "localPath": "09df2b26a6f33471fbb6ca30a85470f8688cffccb",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/09df2b26a6f33471fbb6ca30a85470f8688cffccb"
+    },
+    {
+      "localPath": "0889bbe8c86b34c66aaf0739a96f61d35b810727c",
+      "onlinePath": "https://t17.market.mi-img.com/thumbnail/webp/w1220q70/ThemeMarket/0889bbe8c86b34c66aaf0739a96f61d35b810727c"
+    }
+  ],
+  "parentResources": [],
+  "subResources": [
+    {
+      "localId": "09482257-2ae2-4739-b133-5cd90edd79bf",
+      "resourceCode": "contact",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "1570f81c-1b27-4a09-90db-c291f7c4e5b7",
+      "resourceCode": "wallpaper",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "02d2faec-045e-4cc0-9d80-c45c98ccc670",
+      "resourceCode": "lockstyle",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "15015c66-1883-41a6-9c98-10e0e3a489a7",
+      "resourceCode": "mms",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "52729adc-b8c5-46a7-b8df-99ab7f9cd9dd",
+      "resourceCode": "launcher",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "2eff8f2f-18b9-409a-9348-a0f565893355",
+      "resourceCode": "statusbar",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "44dcd918-72e2-4101-8150-67813685cf0f",
+      "resourceCode": "lockscreen",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "0f2bb873-4f6f-435f-af4c-6f781915d163",
+      "resourceCode": "com.android.settings",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "64f9ad53-e2b7-4df4-ab60-f74978d23afb",
+      "resourceCode": "miui.systemui.plugin",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "9b77504c-f6bc-444f-9d49-faa09bdf2a92",
+      "resourceCode": "clock_2x4",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "ad159cf9-cf74-4814-b0dc-cce47b2f2d04",
+      "resourceCode": "icons",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "e9b83496-65fd-4f4c-81d6-ea7cae50a912",
+      "resourceCode": "com.android.thememanager",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    },
+    {
+      "localId": "36f20666-0e71-41c9-b455-ad3f2c770c13",
+      "resourceCode": "framework-miui-res",
+      "extraMeta": {},
+      "metaPath": null,
+      "contentPath": null
+    }
+  ],
+  "extraMeta": {},
+  "metaPath": null,
+  "contentPath": null,
+  "rightsPath": null,
+  "screenRatio": null,
+  "fontWeight": null,
+  "miuiAdapterVersion": 3.200000047683716,
+  "wallpaperStyle": 0
+}
