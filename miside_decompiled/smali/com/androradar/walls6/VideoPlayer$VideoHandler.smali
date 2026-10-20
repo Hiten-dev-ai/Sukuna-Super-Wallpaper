@@ -534,7 +534,7 @@
 
     if-eqz v0, :cond_resume_play
 
-    const-wide/32 v2, 0x100590
+    const-wide/32 v2, 0x2dc6c0
 
     invoke-virtual {v0, v2, v3}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
 
