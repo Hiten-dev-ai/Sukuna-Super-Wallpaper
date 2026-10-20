@@ -438,6 +438,24 @@
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
+    const/4 v1, 0x1
+
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
+    const/4 v1, 0x3
+
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
+    const/4 v1, 0x4
+
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
     const/4 v1, 0x0
 
     invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
@@ -459,6 +477,18 @@
 
 .method public stop()V
     .locals 2
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
+    const/4 v1, 0x0
+
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
+    const/4 v1, 0x2
+
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 

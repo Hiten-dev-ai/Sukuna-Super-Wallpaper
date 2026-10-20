@@ -343,10 +343,6 @@
 
     invoke-virtual {v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->onResume()V
 
-    const/4 v0, 0x1
-
-    invoke-direct {p0, v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
-
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mGlView:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;
 
     invoke-virtual {v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->requestRender()V

@@ -265,7 +265,7 @@
 
     if-eqz p1, :cond_0
 
-    invoke-virtual {p0}, Lcom/androradar/walls6/WallpaperRenderer;->onScreenOff()V
+    invoke-virtual {p0}, Lcom/androradar/walls6/WallpaperRenderer;->onScreenOn()V
 
     return-void
 

@@ -507,17 +507,10 @@
     invoke-virtual {v0}, Lcom/androradar/walls6/VideoStream;->resetStartTime()V
 
     :cond_0
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    if-eqz v0, :cond_1
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->resumeAdvance()V
+    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer;->play()V
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
 
-    :cond_1
     monitor-exit p0
 
     return-void
