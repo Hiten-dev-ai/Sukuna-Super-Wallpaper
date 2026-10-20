@@ -60,29 +60,13 @@
 .end method
 
 .method public onPause()V
-    .locals 2
-
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->this$1:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;
-
-    const/4 v1, 0x0
-
-    invoke-static {v0, v1}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->access$100(Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;Z)V
-
+    .locals 0
     invoke-super {p0}, Landroid/opengl/GLSurfaceView;->onPause()V
-
     return-void
 .end method
 
 .method public onResume()V
-    .locals 2
-
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->this$1:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;
-
-    const/4 v1, 0x0
-
-    invoke-static {v0, v1}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->access$100(Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;Z)V
-
+    .locals 0
     invoke-super {p0}, Landroid/opengl/GLSurfaceView;->onResume()V
-
     return-void
 .end method

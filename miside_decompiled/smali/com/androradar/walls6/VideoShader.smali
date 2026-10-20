@@ -10,6 +10,8 @@
 
 
 # instance fields
+.field private mUseHomeBackup:Z
+.field private mUseRestBackup:Z
 .field private mBackupTextureHandle:I
 
 .field private mBackupTextureLocation:I
@@ -142,6 +144,7 @@
     iput v2, p0, Lcom/androradar/walls6/VideoShader;->mBackupTextureHandle:I
 
     :cond_0
+    iput-boolean v3, p0, Lcom/androradar/walls6/VideoShader;->mUseBackup:Z
     return-void
 .end method
 
@@ -177,7 +180,18 @@
 
     move-result-object v3
 
+    iget-boolean v4, p0, Lcom/androradar/walls6/VideoShader;->mUseHomeBackup:Z
+    if-eqz v4, :backup_lock
+    iget-boolean v4, p0, Lcom/androradar/walls6/VideoShader;->mUseRestBackup:Z
+    if-eqz v4, :backup_home
+    const-string v4, "rest.jpg"
+    goto :backup_load
+    :backup_home
+    const-string v4, "home.jpg"
+    goto :backup_load
+    :backup_lock
     const-string v4, "backup.jpg"
+    :backup_load
 
     invoke-static {v3, v4}, Lcom/androradar/walls6/Utils;->loadTexture(Landroid/content/res/AssetManager;Ljava/lang/String;)Landroid/graphics/Bitmap;
     :try_end_0
@@ -443,4 +457,25 @@
     invoke-direct {p0}, Lcom/androradar/walls6/VideoShader;->deactivateBackup()V
 
     goto :goto_0
+.end method
+
+.method public useHomeBackup(Z)V
+    .locals 1
+    iget-boolean v0, p0, Lcom/androradar/walls6/VideoShader;->mUseHomeBackup:Z
+    if-eq v0, p1, :cover_done
+    invoke-direct {p0}, Lcom/androradar/walls6/VideoShader;->cleanBackup()V
+    iput-boolean p1, p0, Lcom/androradar/walls6/VideoShader;->mUseHomeBackup:Z
+    invoke-direct {p0}, Lcom/androradar/walls6/VideoShader;->initBackup()V
+    :cover_done
+    return-void
+.end method
+
+.method public useRestBackup(Z)V
+    .locals 1
+    iget-boolean v0, p0, Lcom/androradar/walls6/VideoShader;->mUseRestBackup:Z
+    if-eq v0, p1, :rest_done
+    invoke-direct {p0}, Lcom/androradar/walls6/VideoShader;->cleanBackup()V
+    iput-boolean p1, p0, Lcom/androradar/walls6/VideoShader;->mUseRestBackup:Z
+    :rest_done
+    return-void
 .end method

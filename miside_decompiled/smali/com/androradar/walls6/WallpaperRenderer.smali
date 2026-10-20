@@ -259,19 +259,13 @@
 .end method
 
 .method public onLocked(Z)V
-    .locals 0
-    .annotation build Landroid/support/annotation/MainThread;
-    .end annotation
-
-    if-eqz p1, :cond_0
-
+    .locals 1
+    if-eqz p1, :visible_home
     invoke-virtual {p0}, Lcom/androradar/walls6/WallpaperRenderer;->onScreenOn()V
-
     return-void
-
-    :cond_0
-    invoke-virtual {p0}, Lcom/androradar/walls6/WallpaperRenderer;->onUnlocked()V
-
+    :visible_home
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->playToHome()V
     return-void
 .end method
 
@@ -289,13 +283,8 @@
 
 .method public onUnlocked()V
     .locals 1
-    .annotation build Landroid/support/annotation/MainThread;
-    .end annotation
-
     iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->playToHome()V
-
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->restartHome()V
     return-void
 .end method
 
@@ -368,4 +357,25 @@
     invoke-direct {v1, v0}, Ljava/lang/RuntimeException;-><init>(Ljava/lang/Throwable;)V
 
     throw v1
+.end method
+
+.method public releasePlayer()V
+    .locals 1
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->reset()V
+    return-void
+.end method
+
+.method public onHidden()V
+    .locals 1
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->onHidden()V
+    return-void
+.end method
+
+.method public onVisible()V
+    .locals 1
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->onVisible()V
+    return-void
 .end method

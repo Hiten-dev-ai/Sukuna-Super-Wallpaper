@@ -30,6 +30,8 @@
 
 .field private mLocked:Z
 
+.field private mPendingUnlock:Z
+
 .field private mPowerManager:Landroid/os/PowerManager;
 
 .field private mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
@@ -74,25 +76,29 @@
 
 .method private isDeviceLocked()Z
     .locals 1
-
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mKeyGuardManager:Landroid/app/KeyguardManager;
-
-    if-nez v0, :cond_0
-
-    const/4 v0, 0x0
-
-    return v0
-
-    :cond_0
+    if-eqz v0, :unlocked
     invoke-virtual {v0}, Landroid/app/KeyguardManager;->isKeyguardLocked()Z
-
     move-result v0
-
+    return v0
+    :unlocked
+    const/4 v0, 0x0
     return v0
 .end method
 
 .method private syncLockedState(Z)V
     .locals 2
+
+    # Visibility is authoritative; power state may still lag during a wake callback.
+    iget-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mPendingUnlock:Z
+    if-eqz v0, :sync_keyguard
+    const/4 v0, 0x0
+    iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mPendingUnlock:Z
+    iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mLocked:Z
+    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->onUnlocked()V
+    return-void
+    :sync_keyguard
 
     invoke-direct {p0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->isDeviceLocked()Z
 
@@ -105,6 +111,13 @@
     if-eqz p1, :cond_1
 
     :cond_0
+    # A newly observed keyguard starts a lock session if SCREEN_OFF was missed.
+    if-eqz v0, :dispatch_lock_state
+    iget-boolean v1, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mLocked:Z
+    if-nez v1, :dispatch_lock_state
+    iget-object v1, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
+    invoke-virtual {v1}, Lcom/androradar/walls6/WallpaperRenderer;->onScreenOff()V
+    :dispatch_lock_state
     iget-object v1, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
 
     invoke-virtual {v1, v0}, Lcom/androradar/walls6/WallpaperRenderer;->onLocked(Z)V
@@ -116,46 +129,47 @@
 .end method
 
 .method public handleScreenOn()V
-    .locals 1
+    .locals 2
+    const-string v0, "WallpaperPlayback"
+    const-string v1, "screen_on"
+    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
-    invoke-direct {p0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->isDeviceLocked()Z
-
+    invoke-virtual {p0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->isVisible()Z
     move-result v0
-
-    if-eqz v0, :cond_0
-
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->onScreenOn()V
-
-    goto :goto_0
-
-    :cond_0
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->onUnlocked()V
-
-    :goto_0
+    if-eqz v0, :wake_done
+    const/4 v0, 0x1
+    invoke-direct {p0, v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
+    :wake_done
     return-void
 .end method
 
 .method public handleUnlocked()V
-    .locals 1
+    .locals 2
+    const-string v0, "WallpaperPlayback"
+    const-string v1, "user_present"
+    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
     const/4 v0, 0x0
-
     iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mLocked:Z
-
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->onUnlocked()V
-
+    const/4 v0, 0x1
+    iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mPendingUnlock:Z
+    invoke-virtual {p0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->isVisible()Z
+    move-result v0
+    if-eqz v0, :unlock_done
+    invoke-direct {p0, v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
+    :unlock_done
     return-void
 .end method
 
 .method public handleScreenOff()V
-    .locals 1
+    .locals 2
+    const-string v0, "WallpaperPlayback"
+    const-string v1, "screen_off"
+    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
+
+    const/4 v0, 0x0
+    iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mPendingUnlock:Z
     const/4 v0, 0x1
 
     iput-boolean v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mLocked:Z
@@ -225,10 +239,6 @@
     iput-object v2, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mPowerManager:Landroid/os/PowerManager;
     :try_end_0
     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
-
-    const/4 v2, 0x1
-
-    invoke-direct {p0, v2}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
 
     invoke-virtual {p0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->isPreview()Z
 
@@ -306,34 +316,37 @@
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mGlView:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;
 
     invoke-virtual {v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->onDestroy()V
-
+    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->releasePlayer()V
     return-void
 .end method
 
 .method public onSurfaceDestroyed(Landroid/view/SurfaceHolder;)V
-    .locals 1
-
-    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->clean()V
-
+    .locals 0
+    # GLSurfaceView owns GL resources; a preserved context keeps its player alive.
     invoke-super {p0, p1}, Landroid/service/wallpaper/WallpaperService$Engine;->onSurfaceDestroyed(Landroid/view/SurfaceHolder;)V
-
     return-void
 .end method
 
 .method public onVisibilityChanged(Z)V
     .locals 2
+    const-string v0, "WallpaperVisibility"
+    invoke-static {p1}, Ljava/lang/Boolean;->toString(Z)Ljava/lang/String;
+    move-result-object v1
+    invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
 
     if-eqz p1, :cond_0
 
+    # Visibility may be the only wake event; player segment requests are idempotent.
+    const/4 v0, 0x1
+    invoke-direct {p0, v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
+
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mGlView:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;
 
+    iget-object v1, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
+    invoke-virtual {v1}, Lcom/androradar/walls6/WallpaperRenderer;->onVisible()V
     invoke-virtual {v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->onResume()V
-
-    const/4 v0, 0x1
-
-    invoke-direct {p0, v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->syncLockedState(Z)V
 
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mGlView:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;
 
@@ -343,6 +356,9 @@
     return-void
 
     :cond_0
+    # An app covers the wallpaper without starting a new lock/unlock session.
+    iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mRenderer:Lcom/androradar/walls6/WallpaperRenderer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/WallpaperRenderer;->onHidden()V
     iget-object v0, p0, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine;->mGlView:Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;
 
     invoke-virtual {v0}, Lcom/androradar/walls6/LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView;->onPause()V
