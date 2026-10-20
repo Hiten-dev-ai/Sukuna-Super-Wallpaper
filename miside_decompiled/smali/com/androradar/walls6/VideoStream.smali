@@ -848,3 +848,46 @@
     return-void
 .end method
 
+.method public seekTo(J)V
+    .locals 4
+
+    :try_start_seek_cfg
+    invoke-direct {p0}, Lcom/androradar/walls6/VideoStream;->configure()V
+    :try_end_seek_cfg
+    .catch Ljava/lang/Exception; {:try_start_seek_cfg .. :try_end_seek_cfg} :catch_seek
+
+    iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaExtractor:Landroid/media/MediaExtractor;
+
+    if-eqz v0, :cond_seek_flush
+
+    const/4 v1, 0x0
+
+    invoke-virtual {v0, p1, p2, v1}, Landroid/media/MediaExtractor;->seekTo(JI)V
+
+    :cond_seek_flush
+    iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaCodec:Landroid/media/MediaCodec;
+
+    if-eqz v0, :cond_seek_reset
+
+    :try_start_seek_flush
+    invoke-virtual {v0}, Landroid/media/MediaCodec;->flush()V
+    :try_end_seek_flush
+    .catch Ljava/lang/Exception; {:try_start_seek_flush .. :try_end_seek_flush} :catch_seek
+
+    :cond_seek_reset
+    const-wide/16 v0, -0x1
+
+    iput-wide v0, p0, Lcom/androradar/walls6/VideoStream;->mStartTimeNanos:J
+
+    const/4 v0, 0x0
+
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoStream;->mInEos:Z
+
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoStream;->mOutEos:Z
+
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoStream;->mTargetReached:Z
+
+    :catch_seek
+    return-void
+.end method
+

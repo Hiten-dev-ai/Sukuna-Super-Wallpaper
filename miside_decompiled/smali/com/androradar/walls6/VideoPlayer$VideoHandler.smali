@@ -505,13 +505,13 @@
 .end method
 
 .method public resumeAdvance()V
-    .locals 2
+    .locals 5
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mStreamState:Lcom/androradar/walls6/VideoPlayer$StreamState;
 
     sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
 
-    if-ne v0, v1, :cond_resume_start
+    if-ne v0, v1, :cond_resume_direct
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
@@ -525,7 +525,20 @@
 
     return-void
 
-    :cond_resume_start
+    :cond_resume_direct
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
+
+    invoke-static {v0}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_resume_play
+
+    const-wide/32 v2, 0x1b7740
+
+    invoke-virtual {v0, v2, v3}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
+
+    :cond_resume_play
     invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
 
     return-void
