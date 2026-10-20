@@ -196,7 +196,7 @@
 
     sget-object v2, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
 
-    if-eq v1, v2, :cond_0
+    if-eq v1, v2, :cond_already_playing
 
     :try_start_0
     iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
@@ -214,6 +214,11 @@
     sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
 
     invoke-direct {p0, v1}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->changeState(Lcom/androradar/walls6/VideoPlayer$StreamState;)V
+
+    :cond_already_playing
+    iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+
+    invoke-virtual {v1, v4}, Landroid/os/Handler;->removeMessages(I)V
 
     iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
@@ -502,9 +507,11 @@
 .method public resumeAdvance()V
     .locals 2
 
-    sget-object v0, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mStreamState:Lcom/androradar/walls6/VideoPlayer$StreamState;
 
-    invoke-direct {p0, v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->changeState(Lcom/androradar/walls6/VideoPlayer$StreamState;)V
+    sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
+
+    if-ne v0, v1, :cond_resume_start
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
@@ -515,6 +522,11 @@
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
     invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
+
+    return-void
+
+    :cond_resume_start
+    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
 
     return-void
 .end method
