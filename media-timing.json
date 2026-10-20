@@ -2,11 +2,14 @@
   "source_file": "gemini_generated_video_cfee10d6_gwr_video_mvp.mp4",
   "source_sha256": "609cf4868ec7a535d18bac8a3d3a860e959191ea66d2f09f1da02ba5e8089bd2",
   "fps": 24,
-  "lock_hold_frame": 54,
-  "lock_hold_us": 2250000,
-  "home_start_frame": 55,
-  "home_start_us": 2291667,
+  "lock_hold_frame": 41,
+  "lock_hold_us": 1708333,
+  "home_start_frame": 0,
+  "home_start_us": 0,
   "width": 1220,
   "height": 2712,
-  "framing": "scale to height, center crop; no stretch"
+  "framing": "scale to height, center crop; no stretch",
+  "home_behavior": "Continue displayed lock playback; direct AOD unlock starts the full clip",
+  "lock_resume_frame": 42,
+  "lock_resume_us": 1750000
 }

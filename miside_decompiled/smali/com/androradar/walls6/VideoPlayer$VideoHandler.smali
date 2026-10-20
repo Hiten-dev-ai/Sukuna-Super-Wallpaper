@@ -385,7 +385,7 @@
     move-result-object v1
     const-wide/16 v4, -0x1
     invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
-    const-wide/32 v4, 0x22f7d3
+    const-wide/32 v4, 0x0
     invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
     goto :segment_play
 
@@ -393,7 +393,7 @@
     iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
     invoke-static {v1}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
     move-result-object v1
-    const-wide/32 v4, 0x225510
+    const-wide/32 v4, 0x1a112d
     invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
     const-wide/16 v4, 0x0
     invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
@@ -404,6 +404,18 @@
     invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
     goto/16 :goto_0
 
+    :pswitch_continue_home
+    const-string v1, "WallpaperPlayback"
+    const-string v2, "continue_lock_video"
+    invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+    iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
+    invoke-static {v1}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
+    move-result-object v1
+    const-wide/16 v4, -0x1
+    invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
+    invoke-virtual {v1}, Lcom/androradar/walls6/VideoStream;->resetStartTime()V
+    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
+    goto/16 :goto_0
     :pswitch_data_0
     .packed-switch 0x0
         :pswitch_0
@@ -413,6 +425,7 @@
         :pswitch_4
         :pswitch_home
         :pswitch_lock
+        :pswitch_continue_home
     .end packed-switch
 .end method
 
@@ -548,6 +561,16 @@
     const/4 v1, 0x0
     invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
     const/4 v1, 0x6
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
+    return-void
+.end method
+
+.method public continueHome()V
+    .locals 2
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+    const/4 v1, 0x0
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
+    const/4 v1, 0x7
     invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
     return-void
 .end method

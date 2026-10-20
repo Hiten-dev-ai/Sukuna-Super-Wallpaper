@@ -143,60 +143,23 @@
     return-void
 .end method
 
-.method private declared-synchronized onPlayingComplete()V
+.method private onPlayingComplete()V
     .locals 1
-
-    monitor-enter p0
-
     const/4 v0, 0x0
-
-    :try_start_0
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
-    :try_end_0
-    .catchall {:try_start_0 .. :try_end_0} :catchall_0
-
-    monitor-exit p0
-
     return-void
-
-    :catchall_0
-    move-exception v0
-
-    monitor-exit p0
-
-    throw v0
 .end method
 
-.method private declared-synchronized onResourcesLost(Z)V
+.method private onResourcesLost(Z)V
     .locals 1
-
-    monitor-enter p0
-
-    :try_start_0
+    # Do not acquire the monitor held by reset while it joins VideoHandlerThread.
     sget-object v0, Lcom/androradar/walls6/VideoPlayer$StreamCondition;->NEEDS_RESTART:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
-
     iput-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mStreamCondition:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
-
     const/4 v0, 0x0
-
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
-
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mView:Landroid/opengl/GLSurfaceView;
-
     invoke-virtual {v0}, Landroid/opengl/GLSurfaceView;->requestRender()V
-    :try_end_0
-    .catchall {:try_start_0 .. :try_end_0} :catchall_0
-
-    monitor-exit p0
-
     return-void
-
-    :catchall_0
-    move-exception v0
-
-    monitor-exit p0
-
-    throw v0
 .end method
 
 .method private resetStream()Z
@@ -490,7 +453,11 @@
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
     if-eqz v0, :done
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->playLock()V
+    # A fresh SurfaceTexture prevents a retained frame from a prior unlock being accepted at PTS zero.
+    sget-object v0, Lcom/androradar/walls6/VideoPlayer$StreamCondition;->NEEDS_RESTART:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    iput-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mStreamCondition:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mView:Landroid/opengl/GLSurfaceView;
+    invoke-virtual {v0}, Landroid/opengl/GLSurfaceView;->requestRender()V
     :done
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
@@ -518,7 +485,11 @@
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
     if-eqz v0, :done
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->resumeAdvance()V
+    # A fresh SurfaceTexture prevents a retained frame from a prior unlock being accepted at PTS zero.
+    sget-object v0, Lcom/androradar/walls6/VideoPlayer$StreamCondition;->NEEDS_RESTART:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    iput-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mStreamCondition:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mView:Landroid/opengl/GLSurfaceView;
+    invoke-virtual {v0}, Landroid/opengl/GLSurfaceView;->requestRender()V
     :done
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
@@ -692,14 +663,14 @@
     if-ne v1, v2, :check_lock_frame
     invoke-virtual {v0}, Landroid/graphics/SurfaceTexture;->getTimestamp()J
     move-result-wide v1
-    const-wide v3, 0x88981038L
+    const-wide v3, 0x0L
     cmp-long v1, v1, v3
     if-ltz v1, :cond_0
     goto :frame_ready
     :check_lock_frame
     invoke-virtual {v0}, Landroid/graphics/SurfaceTexture;->getTimestamp()J
     move-result-wide v1
-    const-wide v3, 0x861c4680L
+    const-wide v3, 0x65d317c8L
     cmp-long v1, v1, v3
     if-gtz v1, :cond_0
     :frame_ready
@@ -743,5 +714,42 @@
 
     monitor-exit p0
 
+    throw v0
+.end method
+
+.method public declared-synchronized restartHome()V
+    .locals 3
+    monitor-enter p0
+    :try_start_restart
+    iget v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v1, 0x1
+    if-ne v0, v1, :restart_full
+    iget-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    if-eqz v0, :restart_full
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mStreamCondition:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamCondition;->FINE:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
+    if-ne v0, v1, :restart_full
+    iget-object v2, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
+    if-eqz v2, :restart_full
+    const/4 v0, 0x2
+    iput v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v0, 0x1
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
+    # Keep the displayed lock frame and decoder; unlock continues the gesture without replay.
+    invoke-virtual {v2}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->continueHome()V
+    goto :restart_done
+    :restart_full
+    # A direct AOD unlock starts the full clip, even if a prior off event was missed.
+    const/4 v0, 0x0
+    iput v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer;->playToHome()V
+    :restart_done
+    :try_end_restart
+    .catchall {:try_start_restart .. :try_end_restart} :catch_restart
+    monitor-exit p0
+    return-void
+    :catch_restart
+    move-exception v0
+    monitor-exit p0
     throw v0
 .end method

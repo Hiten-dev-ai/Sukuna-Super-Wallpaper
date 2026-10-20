@@ -11,6 +11,8 @@ import android.opengl.EGLSurface;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.os.Looper;
+import android.os.Handler;
+import android.os.HandlerThread;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,6 +23,8 @@ public class PlaybackSmoke {
     private static Object player;
     private static long homeUs;
     private static long holdUs;
+    private static HandlerThread frameCallbacks;
+    private static SurfaceTexture observedSurface;
 
     private static Object call(Object object, String name, Class<?>[] types, Object... args) throws Exception {
         Method method = object.getClass().getDeclaredMethod(name, types);
@@ -32,6 +36,12 @@ public class PlaybackSmoke {
         Field field = object.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(object);
+    }
+
+    private static void setField(Object object, String name, Object value) throws Exception {
+        Field field = object.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(object, value);
     }
 
     private static void invoke(String name) throws Exception {
@@ -50,9 +60,14 @@ public class PlaybackSmoke {
 
     private static long sample() throws Exception {
         SurfaceTexture surface = (SurfaceTexture) field(player, "mSurfaceTexture");
-        // Poll the real GL texture without requiring the main Looper's callback delivery.
-        call(player, "onFrameAvailable", new Class<?>[]{SurfaceTexture.class}, surface);
+        if (surface != observedSurface) {
+            surface.setOnFrameAvailableListener((SurfaceTexture.OnFrameAvailableListener) player,
+                    new Handler(frameCallbacks.getLooper()));
+            observedSurface = surface;
+        }
+        // Real SurfaceTexture callbacks mark new frames; polling only consumes them on the GL thread.
         invoke("update");
+        surface = (SurfaceTexture) field(player, "mSurfaceTexture");
         long pts = surface.getTimestamp() / 1000;
         if ((int) field(player, "mPlaybackMode") == 2 && (boolean) field(player, "mFrameReady")) {
             check(pts >= homeUs, "Home exposed intro frame at " + pts);
@@ -85,6 +100,8 @@ public class PlaybackSmoke {
             homeUs = Long.parseLong(args[1]);
             holdUs = Long.parseLong(args[2]);
             if (Looper.myLooper() == null) Looper.prepareMainLooper();
+            frameCallbacks = new HandlerThread("PlaybackSmokeFrames");
+            frameCallbacks.start();
             Class<?> threadClass = Class.forName("android.app.ActivityThread");
             Object thread = threadClass.getMethod("systemMain").invoke(null);
             Context system = (Context) threadClass.getMethod("getSystemContext").invoke(thread);
@@ -158,7 +175,11 @@ public class PlaybackSmoke {
             invoke("playToLock");
             long deadline = System.nanoTime() + 6_000_000_000L;
             Object stream = field(player, "mVideoStream");
-            while (!(boolean) call(stream, "isTargetReached", new Class<?>[0]) && System.nanoTime() < deadline) sample();
+            while (System.nanoTime() < deadline) {
+                sample();
+                stream = field(player, "mVideoStream");
+                if ((boolean) call(stream, "isTargetReached", new Class<?>[0])) break;
+            }
             check((boolean) call(stream, "isTargetReached", new Class<?>[0]), "Lock did not pause");
             long held = sample();
             check(held == holdUs, "Wrong lock hold: " + held + " expected " + holdUs);
@@ -166,8 +187,14 @@ public class PlaybackSmoke {
             check(sample() == held, "Lock advanced into reveal");
             System.out.println("PASS exact lock hold: PTS " + held);
 
-            invoke("playToHome");
-            check(waitHome() >= homeUs, "Held lock did not enter home");
+            SurfaceTexture lockedTexture = (SurfaceTexture) field(player, "mSurfaceTexture");
+            invoke("restartHome");
+            check(field(player, "mSurfaceTexture") == lockedTexture, "Lock-to-home replaced the texture instead of continuing");
+            long continueDeadline = System.nanoTime() + 2_000_000_000L;
+            long continuedFrame = 0;
+            while (continuedFrame <= holdUs && System.nanoTime() < continueDeadline) continuedFrame = sample();
+            check(continuedFrame > holdUs, "Held lock did not continue into home");
+            System.out.println("PASS held lock continues into home without seek or replay");
             sleepPlayer();
             invoke("playToLock");
             Thread.sleep(150);
@@ -186,8 +213,74 @@ public class PlaybackSmoke {
             check((int) field(shader, "mBackupTextureHandle") >= 0, "Recreated home fallback was not loaded");
             check(waitHome() >= homeUs, "GL recreation played intro");
             System.out.println("PASS surface recreation retains home");
+
+            // Android may replace only the window surface while preserving the EGL context.
+            Class<?> serviceClass = Class.forName(NS + "LiveWallpaperService");
+            Object service = serviceClass.getConstructor().newInstance();
+            Class<?> engineClass = Class.forName(NS + "LiveWallpaperService$WallpaperEngine");
+            Constructor<?> engineConstructor = engineClass.getDeclaredConstructor(serviceClass);
+            engineConstructor.setAccessible(true);
+            Object engine = engineConstructor.newInstance(service);
+            Class<?> rendererClass = Class.forName(NS + "WallpaperRenderer");
+            Object renderer = rendererClass.getConstructor(Context.class, GLSurfaceView.class).newInstance(context, view);
+            setField(renderer, "mUnlockVideo", player);
+            setField(engine, "mRenderer", renderer);
+            setField(engine, "mPowerManager", system.getSystemService(Context.POWER_SERVICE));
+            setField(engine, "mKeyGuardManager", system.getSystemService(Context.KEYGUARD_SERVICE));
+            sleepPlayer();
+            call(engine, "handleScreenOn", new Class<?>[0]);
+            call(engine, "handleUnlocked", new Class<?>[0]);
+            check((int) field(player, "mPlaybackMode") == 0, "Invisible engine consumed wake/unlock animation");
+            System.out.println("PASS invisible wake/unlock waits for visibility");
+            invoke("playToHome");
+            waitHome();
+            call(engine, "onSurfaceDestroyed", new Class<?>[]{android.view.SurfaceHolder.class}, new Object[]{null});
+            check(field(player, "mSurfaceTexture") != null, "Window surface destruction cleared preserved-context player");
+            check(field(player, "mHandler") != null, "Window surface destruction disposed preserved-context decoder");
+            sleepPlayer();
+            invoke("playToHome");
+            check(waitHome() >= homeUs, "Window surface return failed to resume home");
+            System.out.println("PASS window surface replacement with preserved EGL context");
+
+            for (int cycle = 0; cycle < 4; cycle++) {
+                sleepPlayer();
+                invoke("playToLock");
+                long cycleDeadline = System.nanoTime() + 2_000_000_000L;
+                long lockFrame = Long.MAX_VALUE;
+                while (System.nanoTime() < cycleDeadline) {
+                    lockFrame = sample();
+                    if ((boolean) field(player, "mFrameReady") && lockFrame <= 250000) break;
+                }
+                check(lockFrame <= 250000, "Repeated wake did not start lock video");
+                call(renderer, "onUnlocked", new Class<?>[0]);
+                check(waitHome() >= lockFrame, "Lock-to-home replayed an earlier frame");
+                long homeFrame = 0;
+                cycleDeadline = System.nanoTime() + 2_000_000_000L;
+                while (homeFrame < lockFrame + 125000 && System.nanoTime() < cycleDeadline) homeFrame = sample();
+                check(homeFrame >= lockFrame + 125000, "Repeated unlock video did not advance");
+            }
+            System.out.println("PASS four repeated wake/unlock cycles using real frame callbacks");
+
+            // USER_PRESENT must restart even when the previous off/hide event was missed.
+            call(renderer, "onUnlocked", new Class<?>[0]);
+            check(!(boolean) field(player, "mFrameReady"), "Unlock was ignored because home mode was already latched");
+            check(waitHome() <= 100000, "New unlock did not restart the full video");
+            System.out.println("PASS explicit unlock restarts full video without a preceding screen-off event");
+
+            // Completion cannot wait on the monitor that reset holds while joining its worker.
+            synchronized (player) {
+                Thread callback = new Thread(() -> {
+                    try { invoke("onPlayingComplete"); }
+                    catch (Exception error) { throw new RuntimeException(error); }
+                });
+                callback.start();
+                callback.join(500);
+                check(!callback.isAlive(), "Decoder completion blocks teardown's player monitor");
+            }
+            System.out.println("PASS decoder completion does not deadlock teardown");
             sleepPlayer();
             invoke("reset");
+            frameCallbacks.quitSafely();
             System.out.println("ALL PLAYBACK CHECKS PASSED");
             System.exit(0);
         } catch (Throwable error) {

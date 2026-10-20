@@ -7,13 +7,13 @@
 
 A high-performance **Ryomen Sukuna Domain Expansion ("Malevolent Shrine" / 伏魔御厨子)** Super Wallpaper for Android devices, natively optimized for **Xiaomi HyperOS** and **MIUI**.
 
-Lockscreen plays the opening segment and holds at **2.250000s**. Unlock jumps directly to the home segment at **2.291667s**, including direct AOD unlock and unlock during the intro.
+Lockscreen plays the opening and holds at **1.708333s**. Unlock from lock continues the current video without replay. Direct AOD-to-home unlock starts the full video from frame zero.
 
 ---
 
 ## 🌟 Features
 
-- **Reveal boundary**: Lock holds on source frame 54 (2.250s), with the hand sign complete and face still dark. Home starts on frame 55 (2.291667s), just as the red reveal begins.
+- **Lock boundary**: Source frame 41 (1.708333s). Hand seal complete and face dark; hold before the blood drop begins.
 - **Separate lock and home segments**: Frame zero is used only for lock startup. Screen-off does not decode a frame-zero preroll; a matching `home.jpg` covers the home seek until a home frame is available.
 - **Native HyperOS / MIUI Intent Hooks**: Registered with `miui.service.wallpaper.SuperWallpaperService` and `is_super_wallpaper=true` for seamless integration into Xiaomi's wallpaper pipeline.
 - **Companion Always-On Display (AOD)**: Includes matching MTZ theme packages (`sukuna_aod.mtz`) for Xiaomi AOD engines.
@@ -26,7 +26,7 @@ Lockscreen plays the opening segment and holds at **2.250000s**. Unlock jumps di
 ```
 SukunaSuperWallpaper/
 ├── prebuilt/
-│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (14.34 MB)
+│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (14.04 MB)
 │   ├── sukuna_aod.mtz             # Custom Xiaomi AOD theme package
 │   └── sukuna_aod_store.mtz       # Store-compatible Xiaomi AOD package
 ├── miside_decompiled/             # Full Apktool source tree
@@ -102,8 +102,8 @@ The script will automatically compile `miside_decompiled/` with Apktool, zipalig
 
 ### Unlock Transition Pipeline
 1. **Screen Off / Standby**: Cancel pending playback and retain the requested standby mode without decoding frame zero.
-2. **Screen Wake / Lockscreen**: Play the opening segment and pause exactly at 2.250s while the hand sign is complete and the face remains dark.
-3. **Screen Unlock**: Seek directly to the home IDR at 2.291667s, even when unlock interrupts the opening segment. Duplicate wake/unlock events do not rewind playback.
+2. **Screen Wake / Lockscreen**: Play the opening and hold at 1.708333s. Hand seal complete and face dark; hold before the blood drop begins.
+3. **Screen Unlock**: Continue an already displayed lock video, or start the full clip for direct AOD-to-home unlock. Each new unlock is handled even when a prior screen-off event was missed.
 4. **Homescreen Rest**: Finish the animation and hold the final frame. GL surface recreation retains the selected segment.
 
 ### HyperOS In-Call UI Behavior Note
@@ -118,7 +118,7 @@ This project is a fan-made, non-commercial customization for Android.
 - Base engine derived from open Android live wallpaper research.
 
 
-## Playback fix and verification (v1.1.0)
+## Playback fix and verification (v1.1.3)
 
 See [playback behavior, exact frames and checks](docs/PLAYBACK.md), the [boundary image](docs/transition-boundary.jpg), and [project navigation map](docs/PROJECT_MAP.md).
 

@@ -36,8 +36,11 @@ try {
     $RemoteCommand = "CLASSPATH=$RemoteTemp/classes.dex`:$RemoteTemp/app.apk timeout 30 app_process /system/bin PlaybackSmoke $RemoteTemp/app.apk $($Timing.home_start_us) $($Timing.lock_hold_us)"
     Invoke-Checked 'adb' ($AdbArgs + @('shell', $RemoteCommand))
 } finally {
-    & adb @AdbArgs shell "rm -f $RemoteTemp/classes.dex $RemoteTemp/app.apk; rmdir $RemoteTemp" 2>$null
-    $ResolvedTemp = [IO.Path]::GetFullPath($TaskTemp)
-    if (-not $ResolvedTemp.StartsWith($TempRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Temporary cleanup path escaped system temp directory' }
-    if (Test-Path -LiteralPath $ResolvedTemp) { Remove-Item -LiteralPath $ResolvedTemp -Recurse -Force }
+    try {
+        & adb @AdbArgs shell "if [ -d '$RemoteTemp' ]; then rm -f '$RemoteTemp/classes.dex' '$RemoteTemp/app.apk'; rmdir '$RemoteTemp'; fi" 2>$null
+    } finally {
+        $ResolvedTemp = [IO.Path]::GetFullPath($TaskTemp)
+        if (-not $ResolvedTemp.StartsWith($TempRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Temporary cleanup path escaped system temp directory' }
+        if (Test-Path -LiteralPath $ResolvedTemp) { Remove-Item -LiteralPath $ResolvedTemp -Recurse -Force }
+    }
 }
