@@ -204,14 +204,17 @@ public class PlaybackSmoke {
             check(early <= homeUs + 100000, "Interrupted intro did not seek to home: " + early);
             System.out.println("PASS unlock during intro: first visible PTS " + early);
 
-            // Recreated GL resources must resume home without initial rewind/preroll.
+            // Recreated GL resources must resume home at its displayed position.
+            until = System.nanoTime() + 400_000_000L;
+            while (System.nanoTime() < until) sample();
+            long beforeRecreate = (long) field(player, "mResumePositionUs");
             call(shader, "clean", new Class<?>[0]);
             call(shader, "init", new Class<?>[]{quadClass}, quad);
             call(player, "init", new Class<?>[]{int.class}, texture());
             call(player, "bind", new Class<?>[]{float[].class}, matrix);
             check((boolean) field(shader, "mUseBackup"), "Recreated unready texture was exposed");
             check((int) field(shader, "mBackupTextureHandle") >= 0, "Recreated home fallback was not loaded");
-            check(waitHome() >= homeUs, "GL recreation played intro");
+            check(waitHome() >= beforeRecreate, "GL recreation rewound home");
             System.out.println("PASS surface recreation retains home");
 
             // Android may replace only the window surface while preserving the EGL context.
@@ -242,6 +245,69 @@ public class PlaybackSmoke {
             check(waitHome() >= homeUs, "Window surface return failed to resume home");
             System.out.println("PASS window surface replacement with preserved EGL context");
 
+            // Opening an app is a visibility pause, not a new screen-off/unlock session.
+            Class<?> wallpaperViewClass = Class.forName(NS + "LiveWallpaperService$WallpaperEngine$WallpaperGLSurfaceView");
+            Constructor<?> wallpaperViewConstructor = wallpaperViewClass.getDeclaredConstructor(engineClass, Context.class);
+            wallpaperViewConstructor.setAccessible(true);
+            GLSurfaceView wallpaperView = (GLSurfaceView) wallpaperViewConstructor.newInstance(engine, context);
+            wallpaperView.setRenderer(new GLSurfaceView.Renderer() {
+                public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {}
+                public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 gl, int w, int h) {}
+                public void onDrawFrame(javax.microedition.khronos.opengles.GL10 gl) {}
+            });
+            setField(engine, "mGlView", wallpaperView);
+            setField(engine, "mKeyGuardManager", null); // Fixture represents an unlocked app return.
+            setField(engine, "mLocked", false);
+            setField(engine, "mPendingUnlock", false);
+            until = System.nanoTime() + 400_000_000L;
+            while (System.nanoTime() < until) sample();
+            long beforeApp = sample();
+            call(engine, "onVisibilityChanged", new Class<?>[]{boolean.class}, false);
+            check((int) field(player, "mPlaybackMode") == 2, "Opening an app cleared the home session");
+            Thread.sleep(150);
+            long paused = sample();
+            Thread.sleep(150);
+            check(sample() == paused, "Hidden wallpaper kept decoding");
+            call(engine, "onVisibilityChanged", new Class<?>[]{boolean.class}, true);
+            check(sample() >= beforeApp, "Closing an app replayed the home opening");
+            until = System.nanoTime() + 500_000_000L;
+            long resumed = paused;
+            while (System.nanoTime() < until) resumed = sample();
+            check(resumed > paused, "Closing an app did not resume paused playback");
+            System.out.println("PASS app return preserves the current home session");
+
+            // Use the last three frames to reach genuine decoder completion quickly.
+            setField(player, "mResumePositionUs", 9_875_000L);
+            call(player, "init", new Class<?>[]{int.class}, texture());
+            check(waitHome() >= 9_875_000L, "Restored home ignored saved position");
+            until = System.nanoTime() + 2_000_000_000L;
+            while ((boolean) field(player, "mIsPlaying") && System.nanoTime() < until) sample();
+            check(!(boolean) field(player, "mIsPlaying"), "Home did not complete");
+            Thread.sleep(100);
+            long completed = sample();
+            check(completed == 9_958_333L, "Completion did not hold the final video frame: " + completed);
+            for (int appReturn = 0; appReturn < 3; appReturn++) {
+                call(engine, "onVisibilityChanged", new Class<?>[]{boolean.class}, false);
+                Thread.sleep(100);
+                call(engine, "onVisibilityChanged", new Class<?>[]{boolean.class}, true);
+                Thread.sleep(100);
+                check(sample() == completed, "Completed home replayed on app return");
+                check(!(boolean) field(player, "mIsPlaying"), "App return restarted completed playback");
+            }
+            System.out.println("PASS three app returns retain the completed final frame");
+
+            call(shader, "clean", new Class<?>[0]);
+            call(shader, "init", new Class<?>[]{quadClass}, quad);
+            call(player, "init", new Class<?>[]{int.class}, texture());
+            call(player, "bind", new Class<?>[]{float[].class}, matrix);
+            check((boolean) field(shader, "mUseRestBackup"), "Completed context recreation did not select the final-frame asset");
+            check((boolean) field(shader, "mUseBackup"), "Completed context recreation exposed an empty texture");
+            Thread.sleep(150);
+            sample();
+            check(!(boolean) field(player, "mIsPlaying"), "Context recreation restarted completed home");
+            check(!(boolean) field(player, "mFrameReady"), "Completed context recreation started decoding again");
+            System.out.println("PASS completed context recreation keeps final-frame fallback without replay");
+
             for (int cycle = 0; cycle < 4; cycle++) {
                 sleepPlayer();
                 invoke("playToLock");
@@ -264,7 +330,9 @@ public class PlaybackSmoke {
             // USER_PRESENT must restart even when the previous off/hide event was missed.
             call(renderer, "onUnlocked", new Class<?>[0]);
             check(!(boolean) field(player, "mFrameReady"), "Unlock was ignored because home mode was already latched");
+            invoke("onPlayingComplete"); // A prior decoder can finish while a fresh unlock is pending.
             check(waitHome() <= 100000, "New unlock did not restart the full video");
+            check((boolean) field(player, "mIsPlaying"), "Prior decoder completion cancelled a fresh unlock");
             System.out.println("PASS explicit unlock restarts full video without a preceding screen-off event");
 
             // Completion cannot wait on the monitor that reset holds while joining its worker.

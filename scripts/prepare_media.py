@@ -31,7 +31,7 @@ def main():
         '-force_key_frames', f"expr:eq(n,{timing['home_start_frame']})",
         '-video_track_timescale', '1000000', '-movflags', '+faststart', str(video),
     ], check=True)
-    for frame, name in [(0, 'backup.jpg'), (timing['home_start_frame'], 'home.jpg')]:
+    for frame, name in [(0, 'backup.jpg'), (timing['home_start_frame'], 'home.jpg'), (239, 'rest.jpg')]:
         subprocess.run([
             ffmpeg, '-v', 'error', '-y', '-i', str(video),
             '-vf', f'select=eq(n\\,{frame})', '-frames:v', '1', '-q:v', '2', str(assets / name),

@@ -60,8 +60,8 @@ Enumerated tracked files on 2026-10-21. Runtime playback implementations inspect
 | `miside_decompiled/smali/com/androradar/walls6/Utils.smali` | Runtime playback / AOD | GL handles, shader text and bitmap asset loading |
 | `miside_decompiled/smali/com/androradar/walls6/VideoPlayer$StreamCondition.smali` | Runtime playback / AOD | Nested type consumed by VideoPlayer |
 | `miside_decompiled/smali/com/androradar/walls6/VideoPlayer$StreamState.smali` | Runtime playback / AOD | Nested type consumed by VideoPlayer |
-| `miside_decompiled/smali/com/androradar/walls6/VideoPlayer$VideoHandler.smali` | Runtime playback / AOD | HandlerThread playback messages and segment scheduling |
-| `miside_decompiled/smali/com/androradar/walls6/VideoPlayer.smali` | Runtime playback / AOD | Requested lock/home mode, GL SurfaceTexture and playback lifecycle |
+| `miside_decompiled/smali/com/androradar/walls6/VideoPlayer$VideoHandler.smali` | Runtime playback / AOD | HandlerThread segment commands, visibility gating/resume and saved-position restoration |
+| `miside_decompiled/smali/com/androradar/walls6/VideoPlayer.smali` | Runtime playback / AOD | Requested lock/home mode, visibility pause, displayed PTS, GL SurfaceTexture and completion lifecycle |
 | `miside_decompiled/smali/com/androradar/walls6/VideoShader.smali` | Runtime playback / AOD | External video texture and static fallback texture selection |
 | `miside_decompiled/smali/com/androradar/walls6/VideoStream$IncorrectFileTypeException.smali` | Runtime playback / AOD | Nested type consumed by VideoStream |
 | `miside_decompiled/smali/com/androradar/walls6/VideoStream$OnStreamResourcesLostListener.smali` | Runtime playback / AOD | Nested type consumed by VideoStream |
@@ -117,8 +117,9 @@ Map files: `docs/PROJECT_MAP.md` is the navigation entry; `docs/project-map/inve
 | `media-timing.json` | Media contract | Reviewed source filename/hash, source frames and runtime PTS |
 | `scripts/prepare_media.py` | Media build | Rebuilds video, home keyframe, fallback images and picker images |
 | `scripts/verify_media.py` | Media regression | Verifies stream metadata, frame PTS, runtime constants and APK media bytes |
-| `scripts/PlaybackSmoke.java` | Runtime regression | Exercises actual packaged smali and MediaCodec in offscreen EGL |
+| `scripts/PlaybackSmoke.java` | Runtime regression | Exercises packaged smali/MediaCodec in offscreen EGL, including active/completed app returns and GL restoration |
 | `scripts/test_playback.ps1` | Runtime regression | Compiles/runs smoke harness via adb and cleans task-owned files |
 | `miside_decompiled/assets/home.jpg` | Rendering | Home-start fallback loaded by VideoShader.useHomeBackup |
+| `miside_decompiled/assets/rest.jpg` | Rendering | Final frame 239 used by VideoShader.useRestBackup after completed EGL recreation |
 | `docs/PLAYBACK.md` | Documentation | Frame/mode/message contracts, checks and evidence limits |
 | `docs/transition-boundary.jpg` | Documentation asset | Exact last-lock and first-home frames for user review |

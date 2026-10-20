@@ -365,3 +365,17 @@
     invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->reset()V
     return-void
 .end method
+
+.method public onHidden()V
+    .locals 1
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->onHidden()V
+    return-void
+.end method
+
+.method public onVisible()V
+    .locals 1
+    iget-object v0, p0, Lcom/androradar/walls6/WallpaperRenderer;->mUnlockVideo:Lcom/androradar/walls6/VideoPlayer;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer;->onVisible()V
+    return-void
+.end method

@@ -5,7 +5,7 @@
 - Lock wake plays the opening and pauses on a settled pose.
 - Unlock after lock playback continues the same decoder and SurfaceTexture. It does not replay the opening or seek across a moving gesture.
 - Direct AOD-to-home unlock starts the full supplied clip from frame zero. A new unlock can restart it even when a previous screen-off event was missed.
-- Hiding the wallpaper stops decoding and clears the visible session. A USER_PRESENT received while hidden is retained until visibility reconciliation.
+- Opening an app pauses decoding and keeps the current session. Returning home resumes from the displayed position, or holds the final frame if playback already completed. App visibility alone never resets the session. A USER_PRESENT received while hidden is retained until visibility reconciliation.
 
 | State | Source frame | Packaged timestamp |
 | --- | --- | --- |
@@ -21,13 +21,13 @@ The clip filename/hash and frame contract are in [`media-timing.json`](../media-
 
 ## Runtime ownership
 
-`LiveWallpaperService$WallpaperEngine` owns SCREEN_ON, SCREEN_OFF, USER_PRESENT, visibility and pending-unlock reconciliation. Visibility controls playback; PowerManager.isInteractive can lag a wake callback and is not a playback veto. SCREEN_ON while hidden does not consume the clip. USER_PRESENT calls `WallpaperRenderer.onUnlocked`; an ordinary visibility refresh calls `onLocked`, keeping duplicate refreshes idempotent. Non-content lifecycle traces use `WallpaperPlayback` and `WallpaperVisibility` tags.
+`LiveWallpaperService$WallpaperEngine` owns SCREEN_ON, SCREEN_OFF, USER_PRESENT, visibility and pending-unlock reconciliation. Visibility pauses/resumes playback without resetting its mode or completion; PowerManager.isInteractive can lag a wake callback and is not a playback veto. SCREEN_ON while hidden does not consume the clip. USER_PRESENT calls `WallpaperRenderer.onUnlocked`; an ordinary visibility refresh calls `onLocked`, keeping duplicate refreshes idempotent. Non-content lifecycle traces use `WallpaperPlayback` and `WallpaperVisibility` tags.
 
-`WallpaperGLSurfaceView` owns EGL lifecycle and preserves its context on pause. `WallpaperEngine.onSurfaceDestroyed` must not clear renderer/player resources: a replacement window surface may reuse the same EGL context without another onSurfaceCreated. `WallpaperRenderer.setupResources` cleans/rebuilds GL resources on the GL thread. Engine destruction stops the GL thread and invokes `releasePlayer` to shut down the decoder.
+`WallpaperGLSurfaceView` owns EGL lifecycle and preserves its context on pause. `WallpaperEngine.onSurfaceDestroyed` must not clear renderer/player resources: a replacement window surface may reuse the same EGL context without another onSurfaceCreated. `WallpaperRenderer.setupResources` cleans/rebuilds GL resources on the GL thread. Engine destruction stops the GL thread and invokes `releasePlayer` to shut down the decoder. If EGL resources are recreated, `mResumePositionUs` restores active playback at the last displayed media timestamp. Completed home uses `rest.jpg` (frame 239) without starting the decoder again.
 
 `VideoPlayer.mPlaybackMode` is standby (0), lock (1) or home (2). `restartHome` continues a displayed, healthy mode-1 stream; otherwise it starts a fresh full home session. Fresh sessions recreate SurfaceTexture on the GL thread so a retained frame cannot be mistaken for the new frame-zero session. `onPlayingComplete` and `onResourcesLost` only update volatile state and request rendering, without acquiring the player monitor that reset holds while joining VideoHandlerThread.
 
-`VideoPlayer$VideoHandler` serializes codec access: message 5 starts home, 6 starts lock, and 7 continues lock into home by clearing its pause target and resetting its presentation clock. Continuation never seeks or flushes. `VideoStream.advance` discards seek preroll before `mRenderFromUs`, retains media timestamps and pauses exactly at the configured hold. `VideoShader` uses the appropriate static fallback until a current-session frame arrives; released SurfaceTexture callbacks are ignored.
+`VideoPlayer$VideoHandler` serializes codec access: message 5 starts home, 6 starts lock, 7 continues lock into home by clearing its pause target and resetting its presentation clock, 8 resumes visibility without seeking, and 9 restores the saved timestamp after GL recreation. `mVisibilityPaused` gates queued PLAY/ADVANCE work; resume leaves a reached lock target and completed home stopped. Continuation never seeks or flushes. `VideoStream.advance` discards seek preroll before `mRenderFromUs`, retains media timestamps and pauses exactly at the configured hold. `VideoShader` uses the appropriate static fallback until a current-session frame arrives; released SurfaceTexture callbacks are ignored.
 
 ## Checks
 
@@ -42,12 +42,13 @@ Media rebuilding verifies the supplied clip's SHA-256. Media checks verify 240 f
 
 ## Verification: 2026-10-21
 
-- Reproduced the preserved-context failure against the earlier APK: window destruction cleared the player, leaving no surface/handler for context reuse.
-- Apktool assembly, zip alignment, v1/v2/v3 signatures and exact media/APK checks passed for 1.1.3 / versionCode 2098184.
-- Hardware regressions passed on the connected 2412DPC0AI: cold full-home playback, exact lock hold, held lock-to-home continuation without texture replacement/replay, duplicate refresh, surface recreation, invisible wake/unlock, preserved-context window replacement, four repeated wake/unlock cycles, explicit unlock without a prior off event, and completion during teardown.
-- Both 1.1.3 APKs were installed in place; installed SHA-256 matches the local signed APK. The user's selected Sukuna wallpaper was retained for both home and lock.
-- The user confirmed repeated unlock playback on the preceding 1.1.2 revision. The current revision adds the requested lock-to-home continuation; its physical visual handoff remains for user review.
+- Reproduced the app-return bug against the 1.1.3 Gojo APK: onVisibilityChanged(false) cleared mode 2 as though SCREEN_OFF occurred.
+- Apktool assembly, zip alignment, v1/v2/v3 signatures and exact media/APK checks passed for 1.1.4 / versionCode 2098185.
+- Both APKs passed hardware regressions on the connected 2412DPC0AI: cold full-home playback, exact lock hold, held lock-to-home continuation, duplicate refresh, active playback restoration after GL recreation, invisible wake/unlock, preserved-context window replacement, pause/resume on app return, three app returns after actual decoder completion, final-frame fallback after completed context recreation, four repeated wake/unlock cycles, explicit unlock without a prior off event despite a late prior-decoder completion, and completion during teardown.
+- Both 1.1.4 APKs were installed in place; installed SHA-256 matches the local signed APK.
+- A 1.1.4 candidate with this visibility fix passed three Gojo Settings-to-home checks with identical wallpaper pixels. The final build adds recovery from a late prior-decoder completion and passed both hardware regression suites. The final launcher recheck was excluded because the phone was in use. Wallpaper selection was not changed by the verification script. Sukuna's app-return verification used its actual packaged player/decoder in offscreen EGL.
+- Physical AOD/fingerprint and the artistic timing remain for user review; no new visual cutoff was introduced in this revision.
 
-Installed/prebuilt APK SHA-256: `ca19c86fc262523a3e6a7528621e38c6279b01091cedcf982f3550e029df3570`.
+Installed/prebuilt APK SHA-256: `1b1bb3b2fa9056ada672d3c77088ad6654ac5b42862f25bcb91f763aed94692e`.
 
 Standalone AOD artwork and companion themes remain unchanged. Android references: [engine visibility](https://developer.android.com/reference/android/service/wallpaper/WallpaperService.Engine#onVisibilityChanged(boolean)), [surface timestamps](https://developer.android.com/reference/android/media/MediaCodec#releaseOutputBuffer(int,long)), and [deferred broadcasts](https://developer.android.com/about/versions/14/behavior-changes-all#cached-broadcasts).

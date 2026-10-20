@@ -7,14 +7,14 @@
 
 A high-performance **Ryomen Sukuna Domain Expansion ("Malevolent Shrine" / 伏魔御厨子)** Super Wallpaper for Android devices, natively optimized for **Xiaomi HyperOS** and **MIUI**.
 
-Lockscreen plays the opening and holds at **1.708333s**. Unlock from lock continues the current video without replay. Direct AOD-to-home unlock starts the full video from frame zero.
+Lockscreen plays the opening and holds at **1.708333s**. Unlock from lock continues the current video without replay. Direct AOD-to-home unlock starts the full video from frame zero. Returning from an app resumes the current frame or keeps the completed final frame.
 
 ---
 
 ## 🌟 Features
 
 - **Lock boundary**: Source frame 41 (1.708333s). Hand seal complete and face dark; hold before the blood drop begins.
-- **Separate lock and home segments**: Frame zero is used only for lock startup. Screen-off does not decode a frame-zero preroll; a matching `home.jpg` covers the home seek until a home frame is available.
+- **Playback session**: Lock-to-home continues the current clip. Direct AOD unlock starts at frame zero. Apps pause playback; returning home never restarts a completed animation. Saved timestamps and a final-frame fallback preserve state across GL recreation.
 - **Native HyperOS / MIUI Intent Hooks**: Registered with `miui.service.wallpaper.SuperWallpaperService` and `is_super_wallpaper=true` for seamless integration into Xiaomi's wallpaper pipeline.
 - **Companion Always-On Display (AOD)**: Includes matching MTZ theme packages (`sukuna_aod.mtz`) for Xiaomi AOD engines.
 - **Universal Android Compatibility**: Also works on Samsung One UI, Google Pixel, OnePlus OxygenOS, and stock Android via the Google Wallpapers app.
@@ -26,13 +26,15 @@ Lockscreen plays the opening and holds at **1.708333s**. Unlock from lock contin
 ```
 SukunaSuperWallpaper/
 ├── prebuilt/
-│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (14.04 MB)
+│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (14.34 MB)
 │   ├── sukuna_aod.mtz             # Custom Xiaomi AOD theme package
 │   └── sukuna_aod_store.mtz       # Store-compatible Xiaomi AOD package
 ├── miside_decompiled/             # Full Apktool source tree
 │   ├── AndroidManifest.xml        # Package definitions, permissions & SuperWallpaperService
 │   ├── assets/
 │   │   ├── backup.jpg             # Lock startup fallback image
+│   │   ├── home.jpg               # Direct-home startup fallback
+│   │   ├── rest.jpg               # Completed-home fallback after GL recreation
 │   │   ├── sukuna_aod.png         # AOD texture reference
 │   │   └── unlocked.mp4           # 1220x2712 native 24fps supplied animation
 │   ├── res/                       # App icons, strings & wallpaper metadata
@@ -104,7 +106,7 @@ The script will automatically compile `miside_decompiled/` with Apktool, zipalig
 1. **Screen Off / Standby**: Cancel pending playback and retain the requested standby mode without decoding frame zero.
 2. **Screen Wake / Lockscreen**: Play the opening and hold at 1.708333s. Hand seal complete and face dark; hold before the blood drop begins.
 3. **Screen Unlock**: Continue an already displayed lock video, or start the full clip for direct AOD-to-home unlock. Each new unlock is handled even when a prior screen-off event was missed.
-4. **Homescreen Rest**: Finish the animation and hold the final frame. GL surface recreation retains the selected segment.
+4. **Homescreen Rest / Apps**: Finish the animation and hold the final frame. Apps pause active playback; returning home resumes its position or keeps completion. GL recreation restores the displayed timestamp or final-frame fallback.
 
 ### HyperOS In-Call UI Behavior Note
 In Xiaomi HyperOS, the dialer application (`com.android.incallui` / `XiaomiInCallUI`) queries `MiuiWallpaperManagerService` for a static preview bitmap when rendering the call background. When any live/super wallpaper is applied across both home and lock screens, HyperOS clears the static lockscreen wallpaper cache (`Lock wallpaper state: null`). Because live wallpaper engines do not provide a static surface to external applications, `XiaomiInCallUI` falls back to the system ROM's default gradient (stock pink/blue HyperOS theme). This is an operating system limitation that affects all official Xiaomi Super Wallpapers (Earth, Mars, Snow Mountain) as well.
@@ -118,7 +120,7 @@ This project is a fan-made, non-commercial customization for Android.
 - Base engine derived from open Android live wallpaper research.
 
 
-## Playback fix and verification (v1.1.3)
+## Playback fix and verification (v1.1.4)
 
 See [playback behavior, exact frames and checks](docs/PLAYBACK.md), the [boundary image](docs/transition-boundary.jpg), and [project navigation map](docs/PROJECT_MAP.md).
 
