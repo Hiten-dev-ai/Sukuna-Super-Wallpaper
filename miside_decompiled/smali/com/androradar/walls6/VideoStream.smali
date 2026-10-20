@@ -689,18 +689,30 @@
 
     if-eqz v0, :cond_0
 
-    iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaCodec:Landroid/media/MediaCodec;
-
+    :try_start_rel_codec
     invoke-virtual {v0}, Landroid/media/MediaCodec;->release()V
+    :try_end_rel_codec
+    .catch Ljava/lang/Exception; {:try_start_rel_codec .. :try_end_rel_codec} :catch_rel_codec
+
+    :catch_rel_codec
+    const/4 v0, 0x0
+
+    iput-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaCodec:Landroid/media/MediaCodec;
 
     :cond_0
     iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaExtractor:Landroid/media/MediaExtractor;
 
     if-eqz v0, :cond_1
 
-    iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaExtractor:Landroid/media/MediaExtractor;
-
+    :try_start_rel_ext
     invoke-virtual {v0}, Landroid/media/MediaExtractor;->release()V
+    :try_end_rel_ext
+    .catch Ljava/lang/Exception; {:try_start_rel_ext .. :try_end_rel_ext} :catch_rel_ext
+
+    :catch_rel_ext
+    const/4 v0, 0x0
+
+    iput-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaExtractor:Landroid/media/MediaExtractor;
 
     :cond_1
     return-void
@@ -781,8 +793,15 @@
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoStream;->mMediaCodec:Landroid/media/MediaCodec;
 
-    invoke-virtual {v0}, Landroid/media/MediaCodec;->stop()V
+    if-eqz v0, :cond_skip_stop
 
+    :try_start_stop
+    invoke-virtual {v0}, Landroid/media/MediaCodec;->stop()V
+    :try_end_stop
+    .catch Ljava/lang/Exception; {:try_start_stop .. :try_end_stop} :catch_stop
+
+    :catch_stop
+    :cond_skip_stop
     invoke-virtual {p0}, Lcom/androradar/walls6/VideoStream;->release()V
 
     iput-boolean v1, p0, Lcom/androradar/walls6/VideoStream;->mConfigured:Z
