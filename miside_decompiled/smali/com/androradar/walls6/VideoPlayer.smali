@@ -27,6 +27,10 @@
 
 .field private mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
 
+.field private volatile mPlaybackMode:I
+
+.field private mFrameReady:Z
+
 .field private volatile mIsPlaying:Z
 
 .field private final mLogTag:Ljava/lang/String;
@@ -231,6 +235,16 @@
 
     invoke-virtual {v0, v1}, Lcom/androradar/walls6/VideoShader;->setUvTransform([F)V
 
+    iget v1, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v2, 0x2
+    if-eq v1, v2, :bind_home
+    const/4 v1, 0x0
+    goto :bind_cover
+    :bind_home
+    const/4 v1, 0x1
+    :bind_cover
+    invoke-virtual {v0, v1}, Lcom/androradar/walls6/VideoShader;->useHomeBackup(Z)V
+
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mShader:Lcom/androradar/walls6/Shader;
 
     check-cast v0, Lcom/androradar/walls6/VideoShader;
@@ -239,8 +253,10 @@
 
     sget-object v2, Lcom/androradar/walls6/VideoPlayer$StreamCondition;->FINE:Lcom/androradar/walls6/VideoPlayer$StreamCondition;
 
-    if-eq v1, v2, :cond_0
-
+    if-ne v1, v2, :bind_backup
+    iget-boolean v1, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    if-nez v1, :cond_0
+    :bind_backup
     const/4 v1, 0x1
 
     :goto_0
@@ -335,17 +351,22 @@
 
     iput-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
 
+    const/4 v0, 0x0
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mNewFrameAvailable:Z
+
+    iget v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v1, 0x2
+    if-ne v0, v1, :init_lock
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->resumeAdvance()V
+    goto :cond_0
 
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->rewind()V
-
-    iget-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
-
-    if-eqz v0, :cond_0
-
+    :init_lock
+    const/4 v1, 0x1
+    if-ne v0, v1, :cond_0
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->playLock()V
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
 
@@ -370,6 +391,10 @@
     const/4 v0, 0x1
 
     :try_start_0
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mSurfaceTexture:Landroid/graphics/SurfaceTexture;
+    if-ne p1, v0, :cond_0
+    const/4 v0, 0x1
+
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mNewFrameAvailable:Z
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mView:Landroid/opengl/GLSurfaceView;
@@ -450,84 +475,58 @@
 .end method
 
 .method public declared-synchronized playToLock()V
-    .locals 4
+    .locals 2
     .annotation build Landroid/support/annotation/AnyThread;
     .end annotation
-
     monitor-enter p0
-
     :try_start_0
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mVideoStream:Lcom/androradar/walls6/VideoStream;
-
-    if-eqz v0, :cond_0
-
-    const-wide/32 v2, 0x2dc6c0
-
-    invoke-virtual {v0, v2, v3}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
-
-    :cond_0
-    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer;->play()V
+    iget v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v1, 0x1
+    if-nez v0, :done
+    iput v1, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v0, 0x0
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    const/4 v0, 0x1
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
+    if-eqz v0, :done
+    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->playLock()V
+    :done
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
-
     monitor-exit p0
-
     return-void
-
     :catchall_0
     move-exception v0
-
     monitor-exit p0
-
     throw v0
 .end method
 
 .method public declared-synchronized playToHome()V
-    .locals 4
+    .locals 2
     .annotation build Landroid/support/annotation/AnyThread;
     .end annotation
-
     monitor-enter p0
-
-    const/4 v0, 0x1
-
     :try_start_0
+    iget v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v1, 0x2
+    if-eq v0, v1, :done
+    iput v1, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    const/4 v0, 0x0
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    const/4 v0, 0x1
     iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mIsPlaying:Z
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mVideoStream:Lcom/androradar/walls6/VideoStream;
-
-    if-eqz v0, :cond_0
-
-    const-wide/16 v2, -0x1
-
-    invoke-virtual {v0, v2, v3}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mVideoStream:Lcom/androradar/walls6/VideoStream;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoStream;->resetStartTime()V
-
-    :cond_0
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    if-eqz v0, :cond_1
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
+    if-eqz v0, :done
     invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->resumeAdvance()V
-
-    :cond_1
+    :done
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
-
     monitor-exit p0
-
     return-void
-
     :catchall_0
     move-exception v0
-
     monitor-exit p0
-
     throw v0
 .end method
 
@@ -535,30 +534,19 @@
     .locals 1
     .annotation build Landroid/support/annotation/AnyThread;
     .end annotation
-
     monitor-enter p0
-
     :try_start_0
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    if-eqz v0, :cond_0
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mHandler:Lcom/androradar/walls6/VideoPlayer$VideoHandler;
-
-    invoke-virtual {v0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->rewind()V
+    const/4 v0, 0x0
+    iput v0, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
+    iput-boolean v0, p0, Lcom/androradar/walls6/VideoPlayer;->mNewFrameAvailable:Z
     :try_end_0
     .catchall {:try_start_0 .. :try_end_0} :catchall_0
-
-    :cond_0
     monitor-exit p0
-
     return-void
-
     :catchall_0
     move-exception v0
-
     monitor-exit p0
-
     throw v0
 .end method
 
@@ -676,7 +664,7 @@
 .end method
 
 .method public declared-synchronized update()V
-    .locals 2
+    .locals 5
 
     monitor-enter p0
 
@@ -696,6 +684,27 @@
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mSurfaceTexture:Landroid/graphics/SurfaceTexture;
 
     invoke-virtual {v0}, Landroid/graphics/SurfaceTexture;->updateTexImage()V
+
+    # A previous lock frame can still be queued when USER_PRESENT arrives.
+    iget v1, p0, Lcom/androradar/walls6/VideoPlayer;->mPlaybackMode:I
+    if-eqz v1, :cond_0
+    const/4 v2, 0x2
+    if-ne v1, v2, :check_lock_frame
+    invoke-virtual {v0}, Landroid/graphics/SurfaceTexture;->getTimestamp()J
+    move-result-wide v1
+    const-wide v3, 0x88981038L
+    cmp-long v1, v1, v3
+    if-ltz v1, :cond_0
+    goto :frame_ready
+    :check_lock_frame
+    invoke-virtual {v0}, Landroid/graphics/SurfaceTexture;->getTimestamp()J
+    move-result-wide v1
+    const-wide v3, 0x861c4680L
+    cmp-long v1, v1, v3
+    if-gtz v1, :cond_0
+    :frame_ready
+    const/4 v1, 0x1
+    iput-boolean v1, p0, Lcom/androradar/walls6/VideoPlayer;->mFrameReady:Z
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer;->mSurfaceTexture:Landroid/graphics/SurfaceTexture;
 

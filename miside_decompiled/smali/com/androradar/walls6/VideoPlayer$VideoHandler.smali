@@ -80,8 +80,6 @@
 
     invoke-virtual {v1, p0}, Lcom/androradar/walls6/VideoStream;->setOnStreamResourcesLostListener(Lcom/androradar/walls6/VideoStream$OnStreamResourcesLostListener;)V
 
-    invoke-direct {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->rewindStream()V
-
     return-void
 .end method
 
@@ -379,6 +377,33 @@
 
     nop
 
+
+    # Seek even when the lock intro is PLAYING; run all codec operations on this thread.
+    :pswitch_home
+    iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
+    invoke-static {v1}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
+    move-result-object v1
+    const-wide/16 v4, -0x1
+    invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
+    const-wide/32 v4, 0x22f7d3
+    invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
+    goto :segment_play
+
+    :pswitch_lock
+    iget-object v1, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
+    invoke-static {v1}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
+    move-result-object v1
+    const-wide/32 v4, 0x225510
+    invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->setPauseTimeUs(J)V
+    const-wide/16 v4, 0x0
+    invoke-virtual {v1, v4, v5}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
+
+    :segment_play
+    sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamState;->STOPPED:Lcom/androradar/walls6/VideoPlayer$StreamState;
+    invoke-direct {p0, v1}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->changeState(Lcom/androradar/walls6/VideoPlayer$StreamState;)V
+    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
+    goto/16 :goto_0
+
     :pswitch_data_0
     .packed-switch 0x0
         :pswitch_0
@@ -386,6 +411,8 @@
         :pswitch_2
         :pswitch_3
         :pswitch_4
+        :pswitch_home
+        :pswitch_lock
     .end packed-switch
 .end method
 
@@ -487,7 +514,7 @@
 
     const/4 v1, 0x0
 
-    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
 
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
 
@@ -505,42 +532,22 @@
 .end method
 
 .method public resumeAdvance()V
-    .locals 5
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mStreamState:Lcom/androradar/walls6/VideoPlayer$StreamState;
-
-    sget-object v1, Lcom/androradar/walls6/VideoPlayer$StreamState;->PLAYING:Lcom/androradar/walls6/VideoPlayer$StreamState;
-
-    if-ne v0, v1, :cond_resume_direct
-
+    .locals 2
     iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
-
-    const/4 v1, 0x2
-
-    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeMessages(I)V
-
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
-
+    const/4 v1, 0x0
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
+    const/4 v1, 0x5
     invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
-
-    return-void
-
-    :cond_resume_direct
-    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->this$0:Lcom/androradar/walls6/VideoPlayer;
-
-    invoke-static {v0}, Lcom/androradar/walls6/VideoPlayer;->access$000(Lcom/androradar/walls6/VideoPlayer;)Lcom/androradar/walls6/VideoStream;
-
-    move-result-object v0
-
-    if-eqz v0, :cond_resume_play
-
-    const-wide/32 v2, 0x2dc6c0
-
-    invoke-virtual {v0, v2, v3}, Lcom/androradar/walls6/VideoStream;->seekTo(J)V
-
-    :cond_resume_play
-    invoke-virtual {p0}, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->play()V
-
     return-void
 .end method
 
+
+.method public playLock()V
+    .locals 2
+    iget-object v0, p0, Lcom/androradar/walls6/VideoPlayer$VideoHandler;->mHandler:Landroid/os/Handler;
+    const/4 v1, 0x0
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->removeCallbacksAndMessages(Ljava/lang/Object;)V
+    const/4 v1, 0x6
+    invoke-virtual {v0, v1}, Landroid/os/Handler;->sendEmptyMessage(I)Z
+    return-void
+.end method

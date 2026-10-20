@@ -2,19 +2,19 @@
 
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Xiaomi%20HyperOS%20%7C%20MIUI-orange.svg)](https://android.com)
 [![Engine](https://img.shields.io/badge/Engine-OpenGL%20ES%202.0%20LiveWallpaper-red.svg)]()
-[![Resolution](https://img.shields.io/badge/Resolution-1220x2712%2060fps-blue.svg)]()
+[![Resolution](https://img.shields.io/badge/Resolution-1220x2712%2024fps-blue.svg)]()
 [![License](https://img.shields.io/badge/License-MIT%20%2F%20Non--Commercial-green.svg)]()
 
 A high-performance **Ryomen Sukuna Domain Expansion ("Malevolent Shrine" / 伏魔御厨子)** Super Wallpaper for Android devices, natively optimized for **Xiaomi HyperOS** and **MIUI**.
 
-Features an AMOLED pure-black standby frame on lockscreen standby, transitioning seamlessly into an unwatermarked, high-bitrate 1220×2712 60 FPS Domain Expansion animation the moment the device is unlocked.
+Lockscreen plays the opening segment and holds at **2.250000s**. Unlock jumps directly to the home segment at **2.291667s**, including direct AOD unlock and unlock during the intro.
 
 ---
 
 ## 🌟 Features
 
-- **Domain Expansion: Malevolent Shrine**: High-fidelity cinematic animation cut from Jujutsu Kaisen Season 1 Episode 4, remastered to 1220×2712 vertical AMOLED format with no watermarks.
-- **AMOLED Frame 0 Standby**: Lockscreen keyguard renders a static pure-black Frame 0 (`backup.jpg`) during standby to eliminate battery drain and prevent keyguard desync.
+- **Reveal boundary**: Lock holds on source frame 54 (2.250s), with the hand sign complete and face still dark. Home starts on frame 55 (2.291667s), just as the red reveal begins.
+- **Separate lock and home segments**: Frame zero is used only for lock startup. Screen-off does not decode a frame-zero preroll; a matching `home.jpg` covers the home seek until a home frame is available.
 - **Native HyperOS / MIUI Intent Hooks**: Registered with `miui.service.wallpaper.SuperWallpaperService` and `is_super_wallpaper=true` for seamless integration into Xiaomi's wallpaper pipeline.
 - **Companion Always-On Display (AOD)**: Includes matching MTZ theme packages (`sukuna_aod.mtz`) for Xiaomi AOD engines.
 - **Universal Android Compatibility**: Also works on Samsung One UI, Google Pixel, OnePlus OxygenOS, and stock Android via the Google Wallpapers app.
@@ -26,15 +26,15 @@ Features an AMOLED pure-black standby frame on lockscreen standby, transitioning
 ```
 SukunaSuperWallpaper/
 ├── prebuilt/
-│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (10.09 MB)
+│   ├── SukunaSuperWallpaper.apk   # Ready-to-install signed APK (14.34 MB)
 │   ├── sukuna_aod.mtz             # Custom Xiaomi AOD theme package
 │   └── sukuna_aod_store.mtz       # Store-compatible Xiaomi AOD package
 ├── miside_decompiled/             # Full Apktool source tree
 │   ├── AndroidManifest.xml        # Package definitions, permissions & SuperWallpaperService
 │   ├── assets/
-│   │   ├── backup.jpg             # Frame 0 AMOLED standby image
+│   │   ├── backup.jpg             # Lock startup fallback image
 │   │   ├── sukuna_aod.png         # AOD texture reference
-│   │   └── unlocked.mp4           # 1220x2712 60fps Domain Expansion video
+│   │   └── unlocked.mp4           # 1220x2712 native 24fps supplied animation
 │   ├── res/                       # App icons, strings & wallpaper metadata
 │   └── smali/                     # Modified OpenGL ES wallpaper engine & shader logic
 ├── aod_theme/                     # AOD theme source files and MTZ descriptors
@@ -101,10 +101,10 @@ The script will automatically compile `miside_decompiled/` with Apktool, zipalig
 ## 🧠 Technical Architecture & HyperOS Deep Dive
 
 ### Unlock Transition Pipeline
-1. **Screen Off / Standby**: The engine pauses video playback and binds `backup.jpg` (Frame 0) to the OpenGL ES 2.0 surface.
-2. **Screen Wake / Lockscreen**: Frame 0 remains displayed without decoding video frames, minimizing power consumption on AMOLED displays.
-3. **Screen Unlock**: The `onVisibilityChanged` / `onCommand` triggers surface unlock, and `unlocked.mp4` begins playback at 60 FPS, animating Sukuna forming the Enmaten hand seal and manifesting Malevolent Shrine.
-4. **Homescreen Loop / Rest**: The animation concludes on the grand view of Malevolent Shrine surrounded by cursed skulls and water ripples.
+1. **Screen Off / Standby**: Cancel pending playback and retain the requested standby mode without decoding frame zero.
+2. **Screen Wake / Lockscreen**: Play the opening segment and pause exactly at 2.250s while the hand sign is complete and the face remains dark.
+3. **Screen Unlock**: Seek directly to the home IDR at 2.291667s, even when unlock interrupts the opening segment. Duplicate wake/unlock events do not rewind playback.
+4. **Homescreen Rest**: Finish the animation and hold the final frame. GL surface recreation retains the selected segment.
 
 ### HyperOS In-Call UI Behavior Note
 In Xiaomi HyperOS, the dialer application (`com.android.incallui` / `XiaomiInCallUI`) queries `MiuiWallpaperManagerService` for a static preview bitmap when rendering the call background. When any live/super wallpaper is applied across both home and lock screens, HyperOS clears the static lockscreen wallpaper cache (`Lock wallpaper state: null`). Because live wallpaper engines do not provide a static surface to external applications, `XiaomiInCallUI` falls back to the system ROM's default gradient (stock pink/blue HyperOS theme). This is an operating system limitation that affects all official Xiaomi Super Wallpapers (Earth, Mars, Snow Mountain) as well.
@@ -116,3 +116,10 @@ In Xiaomi HyperOS, the dialer application (`com.android.incallui` / `XiaomiInCal
 This project is a fan-made, non-commercial customization for Android.
 - *Jujutsu Kaisen* and Ryomen Sukuna are trademarks and copyright of Gege Akutami / Shueisha / MAPPA.
 - Base engine derived from open Android live wallpaper research.
+
+
+## Playback fix and verification (v1.1.0)
+
+See [playback behavior, exact frames and checks](docs/PLAYBACK.md), the [boundary image](docs/transition-boundary.jpg), and [project navigation map](docs/PROJECT_MAP.md).
+
+`media-timing.json` records the reviewed source clip/hash, lock hold and first home frame. `scripts/prepare_media.py <source.mp4>` rebuilds media with a home IDR and matching fallback image. Historical anchor patchers are not part of the build and can overwrite these fixes if replayed.
